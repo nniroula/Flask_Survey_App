@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = "OH NO KEY"
 debug = DebugToolbarExtension(app)
-
+app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 # @app.route("/hello")
 # def test_flask_working():
 #     return "Flask is working"
@@ -31,22 +31,37 @@ def show_survey_start_page():
 
 
 # @app.route("/questions/0", methods = ["POST"])
-@app.route("/questions/0")
+
+#@app.route("/questions/0", methods=["POST"])
+@app.route("/firstquestion", methods=["POST"])
 def first_question():
-    return render_template("question_0.html", first_question = questions[0])
+        # return render_template("question_0.html", first_question = questions[0])
+        # better to send to a route and that route should be looping for different question numbers
+    # return render_template("question_0.html", first_question = questions[0])
+    #return redirect("/questions/0") #, first_question = questions[0])
+    return redirect("/questions/0") #,
+
+# Now define quesiton/0 route
+# @app.route("/questions/<int:qnumber>", methods = ["POST"])
+@app.route("/questions/<int:qnumber>")
+def questions(qnumber):
+    # get instance of the survery 
+    question = satisfaction_survey.questions[qnumber]
+    # question = questions[qnumber]  # questions is list generated above
+    return render_template("questions.html", question_number = qnumber, any_question = question)
+    
 
 # fucntion that keeps user input and appends to response list
-@app.route("/answer", methods = ["POST"])
+@app.route("/answer", methods=["POST"])
 def get_input():
     # ans = request.form.get('Ans')
-
-    ans = request.form['Ans']
+    ans = request.form['form-data']
     responses.append(ans)
    
-   
-    return responses
-print(responses)
+    # return redirect("/questions/<int:qnumber>")
+# print(responses)
 
+"""
 @app.route("/answer", methods = ["POST"])
 def answer():
     # raise
@@ -60,7 +75,7 @@ def answer():
     return redirect("question_1.html", second_question = questions[1])  # or redirect ot html file for question 2
 
 print(responses)
-"""
+
 
 @app.route("/questions/1")
 def second_question():
@@ -76,15 +91,15 @@ def fourth_question():
 
 """
 
-
-
-
-
-
 # step 3
-# @app.route("/questions/<int:qnum>")
-# def handle_questions(question_number):
-#     #request.form["value in name attribute"]
+# @app.route("/questions/<int:qnum>", methods = ["POST"])
+# def handle_questions(qnum):
+#     question_number = questions[qnum]
+#     #return render_template("questions.html", current_question = question_number)
+ 
+#     if question_number == 0:
+#         render_template("question_0.html", first_question = questions[0])
+    #request.form["value in name attribute"]
 #     template = "Not a valid question number."
 #     if question_number == 0:
 #         template = render_template("question_0.html", first_question = questions[0])
