@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %} Survey Questions {% endblock %}
+
+<body>
+    {% block content %} 
+
+    <h3>{{any_question.question}}</h3>
+  
+    <!-- now get user input via form -->
+    <form action="/answer", method = "POST">
+        <!-- get ans choices for a given question -->
+        {% for option in any_question.choices %}
+            <p><input type="radio" value={{option}}  name="form-data"></p>
+            {{option}}
+        {% endfor %}
+        <div>
+            <button>next</button>
+        </div>
+    </form>
+    {% endblock %}
+</body>
