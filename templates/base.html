@@ -7,6 +7,10 @@
         <title> {% block title %} title of child file goes here{% endblock %} </title>
     </head>
     <body>
+
+        {% for msg in get_flashed_messages() %}
+            <p> {{msg}} </p>
+        {% endfor %}
         {% block content %} content of child file goes here {% endblock %}
     </body>
 </html>

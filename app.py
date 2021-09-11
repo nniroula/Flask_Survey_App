@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from surveys import satisfaction_survey
 
@@ -52,12 +52,15 @@ def questions(qnumber):
         # return render_template("questions.html", question_number = qnumber, any_question = question)
     # if num is not len(responses):
     if (len(responses) != qnumber):
-        return redirect(f"/quesitons/{len(responses)}")
+        flash("Out of order!")
+        return redirect(f"/quesitons/{len(responses)}") # what if doing render-template than redirect
+        # return render_template(f"/quesitons/{len(responses)}")
     # if qnumber == len(responses):
     # return render_template("questions.html", question_number = qnumber, any_question = question) 
     
     if len(responses) == len(satisfaction_survey.questions):
-        return render_template("thanks.html")
+        # return render_template("thanks.html") # make this redirect to a route and see if it works
+         return redirect("/thanks")
     # else:
     # return redirect("/questions/<int:qnumber>") # return redirect(f"/questions/{len(responses)}") # first question is index 0 and length of responses list is 1. len(responses) should take to the next question.
         # return redirect(f"/questions/{len(responses)}")
@@ -76,7 +79,12 @@ def get_input():
     responses.append(ans)
     # get the length of the list and then return to the next question
     if len(responses) == len(satisfaction_survey.questions):
-        return render_template("thanks.html")
+        # return render_template("thanks.html")
+        return redirect("/thanks")
     # else:
     # return redirect("/questions/<int:qnumber>") # return redirect(f"/questions/{len(responses)}") # first question is index 0 and length of responses list is 1. len(responses) should take to the next question.
     return redirect(f"/questions/{len(responses)}")
+
+@app.route("/thanks")
+def thanks_client():
+    return render_template("thanks.html")
