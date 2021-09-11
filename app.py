@@ -52,8 +52,11 @@ def get_input():
     responses.append(ans)
 # get the length of the list and then return to the next question
 
+    if len(responses) == len(satisfaction_survey.questions):
+        return render_template("thanks.html")
+    else:
 # return redirect("/questions/<int:qnumber>") # return redirect(f"/questions/{len(responses)}") # first question is index 0 and length of responses list is 1. len(responses) should take to the next question.
-    return redirect(f"/questions/{len(responses)}")
+        return redirect(f"/questions/{len(responses)}")
 
 
 
