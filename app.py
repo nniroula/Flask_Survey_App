@@ -44,18 +44,17 @@ def questions(qnumber):
     # question = questions[qnumber]  # questions is list generated above
     return render_template("questions.html", question_number = qnumber, any_question = question)
     
-
 # fucntion that keeps user input and appends to response list
 @app.route("/answer", methods=["POST"])
 def get_input():
     # ans = request.form.get('Ans')
     ans = request.form['form-data']
     responses.append(ans)
-   # get the length of the list and then return to the next question
+# get the length of the list and then return to the next question
 
-    # return redirect("/questions/<int:qnumber>")
-    return redirect("/firstquestion")
-# Note: How can I redirect from here to get the next question?
+# return redirect("/questions/<int:qnumber>") # return redirect(f"/questions/{len(responses)}") # first question is index 0 and length of responses list is 1. len(responses) should take to the next question.
+    return redirect(f"/questions/{len(responses)}")
 
-# print(responses)
+
+
 
