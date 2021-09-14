@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, redirect, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 from surveys import satisfaction_survey
 
@@ -11,6 +11,7 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 # def test_flask_working():
 #     return "Flask is working"
 
+RES_KEY = "keyvalueforsessionkey"
 responses = []
 # create a set to keep track of the question numbers
 visited = set()
@@ -32,6 +33,8 @@ def show_survey_start_page():
 #@app.route("/questions/0", methods=["POST"])
 @app.route("/firstquestion", methods=["POST"])
 def first_question():
+    # use key to store values for sessions
+    session[RES_KEY] = []
     visited.add(0)
     return redirect("/questions/0") #,
 # Now define quesiton/0 route
@@ -39,6 +42,8 @@ def first_question():
 @app.route("/questions/<int:qnumber>")
 def questions(qnumber):
     qnumber = qnumber
+    # set up the session
+    responses = session.get(RES_KEY)
     # get instance of the survery 
     question = satisfaction_survey.questions[qnumber]
 
@@ -65,7 +70,11 @@ def questions(qnumber):
 def get_input():
     # ans = request.form.get('Ans')
     ans = request.form['form-data']
-    responses.append(ans)
+    # put this input in session
+    respond = session["RES_KEY"]
+    respond.append(ans)
+    session[RES_KEY] = respond 
+    # responses.append(ans)
 
     if max(visited) + 1 == len(satisfaction_survey.questions):
         # return render_template("thanks.html")
