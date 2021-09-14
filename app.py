@@ -12,12 +12,13 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 #     return "Flask is working"
 
 responses = []
+# create a set to keep track of the question numbers
+visited = set()
 
 title = satisfaction_survey.title
 instructions = satisfaction_survey.instructions
 
 # question_1 = satisfaction_survey.questions[0].question
-
 questions = [satisfaction_survey.questions[0].question,
             satisfaction_survey.questions[1].question,
             satisfaction_survey.questions[2].question,
@@ -31,45 +32,33 @@ def show_survey_start_page():
 #@app.route("/questions/0", methods=["POST"])
 @app.route("/firstquestion", methods=["POST"])
 def first_question():
-        # return render_template("question_0.html", first_question = questions[0])
-        # better to send to a route and that route should be looping for different question numbers
+    visited.add(0)
     return redirect("/questions/0") #,
-
 # Now define quesiton/0 route
 # @app.route("/questions/<int:qnumber>", methods = ["POST"])
 @app.route("/questions/<int:qnumber>")
 def questions(qnumber):
-    # for step 6
     qnumber = qnumber
-    print(qnumber)
-    # above is for step 6
-
     # get instance of the survery 
     question = satisfaction_survey.questions[qnumber]
 
-     # for step 5
-    # if qnumber == len(responses):
-        # return render_template("questions.html", question_number = qnumber, any_question = question)
-    # if num is not len(responses):
-    if (len(responses) != qnumber):
-        flash("Out of order!")
-        return redirect(f"/quesitons/{len(responses)}") # what if doing render-template than redirect
-        # return render_template(f"/quesitons/{len(responses)}")
-    # if qnumber == len(responses):
-    # return render_template("questions.html", question_number = qnumber, any_question = question) 
-    
-    if len(responses) == len(satisfaction_survey.questions):
-        # return render_template("thanks.html") # make this redirect to a route and see if it works
-         return redirect("/thanks")
-    # else:
-    # return redirect("/questions/<int:qnumber>") # return redirect(f"/questions/{len(responses)}") # first question is index 0 and length of responses list is 1. len(responses) should take to the next question.
-        # return redirect(f"/questions/{len(responses)}")
+    if len(visited) == 0 and qnumber != 0:
+        return redirect('/')
+
+    if len(visited) != 0:
+        if(qnumber > max(visited) and max(visited) + 1 != qnumber):
+            #return redirect(f"/questions/{max(visited)}")
+            flash("Not a valid route")
+            return redirect(f"/questions/{max(visited) + 1}")
+        if qnumber < max(visited):
+            for q in range(qnumber, max(visited) + 1):
+                #visited.remove(q)
+                #return redirect(f"/quesions/{max(visited) + 1}") # if a user goes to the random question without answer one in the order
+                flash("please visit in an orderly manner")
+                return redirect(f"/quesions/{max(visited)}")
+        visited.add(qnumber)
+
     return render_template("questions.html", question_number = qnumber, any_question = question) 
-
-    # above is step 5
-
-    # question = questions[qnumber]  # questions is list generated above
-    # return render_template("questions.html", question_number = qnumber, any_question = question)
 
 # fucntion that keeps user input and appends to response list
 @app.route("/answer", methods=["POST"])
@@ -77,13 +66,12 @@ def get_input():
     # ans = request.form.get('Ans')
     ans = request.form['form-data']
     responses.append(ans)
-    # get the length of the list and then return to the next question
-    if len(responses) == len(satisfaction_survey.questions):
+
+    if max(visited) + 1 == len(satisfaction_survey.questions):
         # return render_template("thanks.html")
         return redirect("/thanks")
-    # else:
-    # return redirect("/questions/<int:qnumber>") # return redirect(f"/questions/{len(responses)}") # first question is index 0 and length of responses list is 1. len(responses) should take to the next question.
-    return redirect(f"/questions/{len(responses)}")
+    else:
+        return redirect(f"/questions/{max(visited) + 1}")
 
 @app.route("/thanks")
 def thanks_client():
